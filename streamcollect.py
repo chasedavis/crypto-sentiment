@@ -31,7 +31,7 @@ class MyStreamListener(tweepy.StreamListener):
     def on_status(self, status):
         # print status
         with open("ether_data.txt", "a") as myfile:
-            myfile.write(str(status))
+            myfile.write('\n' + str(status))
         return True
 
     def on_error(self, status):
