@@ -1,6 +1,7 @@
 import tweepy
 import pandas as pd
 import numpy as np
+import json
 
 # Twitter API Access Keys
 from credentials import *
@@ -25,13 +26,21 @@ def twitter_setup():
     api = tweepy.API(auth)
     return api
 
+def status_to_JSON(tweet):
+
+    wanted_attr = ['created_at', 'id', 'text', 'source', 'user', 'is_quote_status', 'quote_count', 'reply_count', 'retweet_count', 'favorite_count', 'entities', 'lang']
+    unwanted_attr = ['_json', 'author', 'entities', 'contributors', 'coordinates', 'favorited', 'filter_level', 'geo', 'id_str', 'in_reply_to_screen_name', 'in_reply_to_status_id', 'in_reply_to_status_id_str', 'in_reply_to_user_id', 'in_reply_to_user_id_str',
+'place', 'retweeted', 'source_url', 'timestamp_ms', 'truncated']
+    for attr in unwanted_attr:
+        delattr(tweet, attr)
+
+    return str(tweet)
 #override tweepy.StreamListener to add logic to on_status
 class MyStreamListener(tweepy.StreamListener):
 
     def on_status(self, status):
-        # print status
         with open("ether_data.txt", "a") as myfile:
-            myfile.write('\n' + str(status))
+            myfile.write('\n' + status_to_JSON(status))
         return True
 
     def on_error(self, status):
@@ -43,15 +52,3 @@ api = twitter_setup()
 myStreamListener = MyStreamListener()
 myStream = tweepy.Stream(auth = api.auth, listener=myStreamListener)
 myStream.filter(track=['ether', 'ethereum'])
-
-
-# if __name__ == '__main__':
-#
-#     #This handles Twitter authetification and the connection to Twitter Streaming API
-#     l = MyStreamListener()
-#     auth = OAuthHandler(consumer_key, consumer_secret)
-#     auth.set_access_token(access_token, access_token_secret)
-#     stream = Stream(auth, l)
-#
-#     #This line filter Twitter Streams to capture data by the keywords: 'python', 'javascript', 'ruby'
-#     stream.filter(track=['ether', 'ethereum'])
