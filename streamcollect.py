@@ -27,10 +27,29 @@ def twitter_setup():
 
 #override tweepy.StreamListener to add logic to on_status
 class MyStreamListener(tweepy.StreamListener):
+
     def on_status(self, status):
-        print(status.text)
+        print status
+        return True
+
+    def on_error(self, status):
+        print status
+
 
 api = twitter_setup()
 
 myStreamListener = MyStreamListener()
-myStream = tweepy.Stream(auth = api.auth, listener=myStreamListener, q='buy sell bitcoin', count=COUNT)
+myStream = tweepy.Stream(auth = api.auth, listener=myStreamListener)
+myStream.filter(track=['ether', 'ethereum'])
+
+
+# if __name__ == '__main__':
+#
+#     #This handles Twitter authetification and the connection to Twitter Streaming API
+#     l = MyStreamListener()
+#     auth = OAuthHandler(consumer_key, consumer_secret)
+#     auth.set_access_token(access_token, access_token_secret)
+#     stream = Stream(auth, l)
+#
+#     #This line filter Twitter Streams to capture data by the keywords: 'python', 'javascript', 'ruby'
+#     stream.filter(track=['ether', 'ethereum'])
