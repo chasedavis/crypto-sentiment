@@ -10,11 +10,12 @@ from datetime import datetime
 # 2017-05-01T00:00:00-04:00 = 1493611200
 # 2017-08-09T00:00:00-04:00 = 1502251200
 # 100 days or 2400 hours of data
-
+# -> adjust more
 # collect data from Aug 9, 2017 to Nov 17, 2017 as test data
 # 2017-08-09T01:00:00-04:00 = 1502254800
 # 2017-11-17T00:00:00-04:00 = 1510891200
 # 100 days or 2400 hours of data
+# -> adjust less
 
 def collectOldVals(timeunit, starttime, endtime, file):
 	public_client = gdax.PublicClient()
@@ -27,14 +28,16 @@ def collectOldVals(timeunit, starttime, endtime, file):
 	while(start_unix < endtime):
 		end_unix = start_unix + (timeunit * 200)
 		print end_unix
-
+		
+		# keep times in Eastern Time
 		start_iso = datetime.fromtimestamp(start_unix).isoformat() +'-04:00'
 		end_iso = datetime.fromtimestamp(end_unix).isoformat() +'-04:00'
 
+		# store data temporarily as strings
 		hist_rates = str(public_client.get_product_historic_rates('ETH-USD', start_iso, end_iso, granularity = timeunit))
-		#print hist_rates[0]
+
 		datafile.write(hist_rates)
-		# do something with data -> store it? 
+
 		start_unix = end_unix
 
 # training data
