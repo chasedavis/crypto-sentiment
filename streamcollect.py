@@ -1,3 +1,5 @@
+# Twitter module for collecting tweets in realtime. Can get 50K tweets a day. Chase Davis.
+
 import tweepy
 import pandas as pd
 import numpy as np
@@ -39,7 +41,7 @@ def status_to_JSON(tweet):
 class MyStreamListener(tweepy.StreamListener):
 
     def on_status(self, status):
-        with open("ether_data.txt", "a") as myfile:
+        with open("textdata/ether_data.txt", "a") as myfile:
             myfile.write('\n' + status_to_JSON(status))
         return True
 

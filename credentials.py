@@ -1,4 +1,4 @@
-# Twitter login credentials -- for account @Chase_Davis_
+# Twitter login credentials
 
 CONSUMER_KEY = 'OfFBQY83dBiacHqimEqF0DN87'
 CONSUMER_SECRET = 'bXTxwsHgo179HoTYSc2y9CWXJTqffcC5NiHWrSc5NbPCaFtiNp'
