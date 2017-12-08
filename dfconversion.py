@@ -22,6 +22,7 @@ def storeValsinDF(textfile):
 	# reddit
 	fp = open(textfile, 'r')
 	df_reddit = pd.read_csv(fp, usecols=[3,6])
+	df_reddit.sort_values('created_utc')
 
 	# google news
 	fp_news = open('news-ethereum5.csv','r')
@@ -32,6 +33,10 @@ def storeValsinDF(textfile):
 	df_NN = pd.DataFrame(index = range(0,(df_news.shape[0] + df_reddit.shape[0] - 1)), columns = ['prev_price', 'next_price', 'pos', 'neg', 'neu', 'compound'])
 
 	sid = SentimentIntensityAnalyzer()
+	
+	df_price.sort_values('datetime')
+	df_price.drop_duplicates(subset = 'datetime')
+
 
 	for index, row in df_reddit.iterrows():
 		ss = sid.polarity_scores(row['title'])
@@ -41,17 +46,15 @@ def storeValsinDF(textfile):
 		df_NN.set_value(index, 'pos', ss['pos'])
 		# time calc
 		prev_time = row['created_utc'] - (row['created_utc'] % 3600)
-		next_time = prev_time + 3600
-		print index
-		# price calc
-		for i in range(0, (df_price.shape[0] - 1)):
-			pricetime = df_price.loc[[i]]['datetime']
+		#print index
 
-			if(int(pricetime) == int(prev_time)):
-				df_NN.set_value(index, 'prev_price', float(df_price.loc[[i]]['prices']))
-				df_NN.set_value(index, 'next_price', float(df_price.loc[[i + 1]]['prices']))
-				break
-		
+		row_price = df_price.loc[df_price['datetime'] == prev_time]
+		#print len(row_price),row_price['prices']
+
+		if not row_price.empty:
+			df_NN.set_value(index, 'prev_price', row_price.iloc[0,1])
+			df_NN.set_value(index, 'next_price', float(df_price.loc[[row_price.index[0] + 1]]['prices']))
+	
 	for index, row in df_news.iterrows():
 		ss_d = sid.polarity_scores(row['description'])
 		ss_t = sid.polarity_scores(row['title'])
@@ -61,19 +64,17 @@ def storeValsinDF(textfile):
 		df_NN.set_value(index + (df_reddit.shape[0]), 'pos', ((ss_t['pos']+ss_d['pos'])/2))
 		# time calc
 		prev_time = row['publishedAt'] - (row['publishedAt'] % 3600)
-		next_time = prev_time + 3600
-		print index + (df_reddit.shape[0])
-		# price calc
-		for i in range(0, (df_price.shape[0] - 1)):
-			pricetime = df_price.loc[[i]]['datetime']
 
-			if(int(pricetime) == int(prev_time)):
-				df_NN.set_value(index + (df_reddit.shape[0]), 'prev_price', float(df_price.loc[[i]]['prices']))
-				df_NN.set_value(index + (df_reddit.shape[0]), 'next_price', float(df_price.loc[[i + 1]]['prices']))
-				break
+		#print index + (df_reddit.shape[0])
+		row_price = df_price.loc[df_price['datetime'] == prev_time]
 
+		if not row_price.empty:
+			df_NN.set_value(index + (df_reddit.shape[0]), 'prev_price', row_price.iloc[0,1])
+			df_NN.set_value(index + (df_reddit.shape[0]), 'next_price', float(df_price.loc[[row_price.index[0] + 1]]['prices']))
+
+	
 	with open('NN_pickles.p', 'wb') as fp:
-   		pickle.dump(df_NN, fp)
+ 		pickle.dump(df_NN, fp)
 
 	print df_NN
 
@@ -81,8 +82,8 @@ def checkpickle():
 	df_NN_pickle = pickle.load(open('NN_pickles.p', 'rb'))
 	print df_NN_pickle
 
-#storeValsinDF('reddit-ethereum.csv')
-checkpickle()
+storeValsinDF('reddit-ethereum.csv')
+# checkpickle()
 
 
 
