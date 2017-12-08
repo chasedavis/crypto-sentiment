@@ -34,10 +34,11 @@ def storeValsinDF(textfile):
 
 	sid = SentimentIntensityAnalyzer()
 	
+	#sort and drop duplicates	
 	df_price.sort_values('datetime')
 	df_price.drop_duplicates(subset = 'datetime')
 
-
+	# go through each row of reddit data and assign sentiment values
 	for index, row in df_reddit.iterrows():
 		ss = sid.polarity_scores(row['title'])
 		df_NN.set_value(index,'compound', ss['compound'])
@@ -46,15 +47,15 @@ def storeValsinDF(textfile):
 		df_NN.set_value(index, 'pos', ss['pos'])
 		# time calc
 		prev_time = row['created_utc'] - (row['created_utc'] % 3600)
-		#print index
-
+		# get corresponding row
 		row_price = df_price.loc[df_price['datetime'] == prev_time]
-		#print len(row_price),row_price['prices']
 
+		# add prices to the Neural Net dataframe
 		if not row_price.empty:
 			df_NN.set_value(index, 'prev_price', row_price.iloc[0,1])
 			df_NN.set_value(index, 'next_price', float(df_price.loc[[row_price.index[0] + 1]]['prices']))
 	
+	# assign sentiment values to each news dataframe
 	for index, row in df_news.iterrows():
 		ss_d = sid.polarity_scores(row['description'])
 		ss_t = sid.polarity_scores(row['title'])
@@ -65,14 +66,13 @@ def storeValsinDF(textfile):
 		# time calc
 		prev_time = row['publishedAt'] - (row['publishedAt'] % 3600)
 
-		#print index + (df_reddit.shape[0])
 		row_price = df_price.loc[df_price['datetime'] == prev_time]
 
 		if not row_price.empty:
 			df_NN.set_value(index + (df_reddit.shape[0]), 'prev_price', row_price.iloc[0,1])
 			df_NN.set_value(index + (df_reddit.shape[0]), 'next_price', float(df_price.loc[[row_price.index[0] + 1]]['prices']))
 
-	
+	# store in a pickle datafile 
 	with open('NN_pickles.p', 'wb') as fp:
  		pickle.dump(df_NN, fp)
 
@@ -83,7 +83,7 @@ def checkpickle():
 	print df_NN_pickle
 
 storeValsinDF('reddit-ethereum.csv')
-# checkpickle()
+checkpickle()
 
 
 

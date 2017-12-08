@@ -53,7 +53,7 @@ def storeValsinDF(textfile):
 			df_NN.set_value(index, 'prev_price', row_price.iloc[0,1])
 			df_NN.set_value(index, 'next_price', float(df_price.loc[[row_price.index[0] + 1]]['prices']))
 			df_NN.set_value(index, 'datetime', prev_time)
-	
+
 	for index, row in df_news.iterrows():
 		ss_d = sid.polarity_scores(row['description'])
 		ss_t = sid.polarity_scores(row['title'])
@@ -76,14 +76,12 @@ def storeValsinDF(textfile):
 	with open('NN_pickled_time.p', 'wb') as fp:
  		pickle.dump(df_NN, fp)
 
-	print df_NN
-
 def checkpickle():
 	df_NN_pickle = pickle.load(open('NN_pickled_time.p', 'rb'))
 	print df_NN_pickle
 
 storeValsinDF('reddit-ethereum.csv')
-# checkpickle()
+checkpickle()
 
 
 
