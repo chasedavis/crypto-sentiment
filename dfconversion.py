@@ -30,7 +30,7 @@ def storeValsinDF(textfile):
 	df_news['description'] = df_news['description'].apply(lambda x : str(x))
 
 	# NN dataframe - save all in here
-	df_NN = pd.DataFrame(index = range(0,(df_news.shape[0] + df_reddit.shape[0] - 1)), columns = ['prev_price', 'next_price', 'pos', 'neg', 'neu', 'compound'])
+	df_NN = pd.DataFrame(index = range(0,(df_news.shape[0] + df_reddit.shape[0] - 1)), columns = ['prev_price', 'compound', 'neg', 'neu', 'pos', 'next_price'])
 
 	sid = SentimentIntensityAnalyzer()
 	
